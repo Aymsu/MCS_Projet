@@ -1,5 +1,6 @@
 package com.paulsab.aymer.mcs;
 
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
@@ -53,6 +54,9 @@ import java.util.jar.Manifest;
                     else if (event.getAction() == MotionEvent.ACTION_UP){
                         recorder.stopRecording();
                         talkButton.setText("Released");
+                        MediaPlayer mp = MediaPlayer.create(getBaseContext(),
+                                R.raw.bastionSound);
+                        mp.start();
                     }
                     return false;
                 }
