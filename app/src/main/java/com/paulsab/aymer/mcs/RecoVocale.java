@@ -174,16 +174,16 @@ public class RecoVocale extends AppCompatActivity {
                 bufferReadResult = record.read(audioSamples, 0, minBytes);
                 for ( int i = 0 ; i < minBytes && i < bufferReadResult ; i++) {
                         fftData[i] = win[i] * audioSamples[i];
-                    if ( audioSamples[i] > 500) {
+                    /*if ( audioSamples[i] > 500) {
                         valplus++;
                     }else{
-                        valmoins++;
-                    }
+                        valmoins++;*/
+                    //}
                    // Log.i(Constante.TAG,"fftdata = "+audioSamples[i]);
                 }
-                Log.i(Constante.TAG,"plus = "+valplus+" moins = "+valmoins);
+                /*Log.i(Constante.TAG,"plus = "+valplus+" moins = "+valmoins);
                 valmoins = 0;
-                valplus = 0;
+                valplus = 0;*/
                 fft.ft(fftData);
                 convertToDb(fftData, scale);
 

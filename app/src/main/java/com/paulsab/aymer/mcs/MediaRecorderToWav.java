@@ -1,6 +1,7 @@
 package com.paulsab.aymer.mcs;
 
 
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
 
@@ -44,6 +45,7 @@ public class MediaRecorderToWav {
         }
         recorder.release();
         recorder = null;
+
     }
 
     public String getFilenameDirectory(){
