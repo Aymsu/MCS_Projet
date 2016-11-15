@@ -22,7 +22,7 @@ public class StartActivity extends AppCompatActivity {
 
     public void launchAide(View v){
 
-        Intent i = new Intent(this, Aide.class);
+        Intent i = new Intent(this, RecoVocale.class);
         startActivity(i);
 
     }
