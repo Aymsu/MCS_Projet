@@ -21,7 +21,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceView;
+
+import com.paulsab.aymer.mcs.AnalyzeActivity.Constante;
 
 import java.util.LinkedList;
 
@@ -36,7 +39,7 @@ public class WaveformView extends SurfaceView {
     // To make quieter sounds still show up well on the display, we use +/- 8192 as the amplitude
     // that reaches the top/bottom of the view instead of +/- 32767. Any samples that have
     // magnitude higher than this limit will simply be clipped during drawing.
-    private static final float MAX_AMPLITUDE_TO_DRAW = 8192.0f;
+    private static final float MAX_AMPLITUDE_TO_DRAW = 32767.0f;
 
     // The queue that will hold historical audio data.
     private final LinkedList<short[]> mAudioData;
@@ -99,7 +102,7 @@ public class WaveformView extends SurfaceView {
      */
     private void drawWaveform(Canvas canvas) {
         // Clear the screen each time because SurfaceView won't do this for us.
-        canvas.drawColor(Color.BLACK);
+        canvas.drawColor(Color.DKGRAY);
 
         float width = getWidth();
         float height = getHeight();
@@ -121,7 +124,9 @@ public class WaveformView extends SurfaceView {
             for (int x = 0; x < width; x++) {
                 int index = (int) ((x / width) * buffer.length);
                 short sample = buffer[index];
+
                 float y = (sample / MAX_AMPLITUDE_TO_DRAW) * centerY + centerY;
+
 
                 if (lastX != -1) {
                     canvas.drawLine(lastX, lastY, x, y, mPaint);

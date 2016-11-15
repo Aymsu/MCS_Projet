@@ -102,6 +102,7 @@ public class RecoVocale extends Activity {
             record = new AudioRecord(MediaRecorder.AudioSource.MIC, Constante.SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
             record.startRecording();
+
             while(isRunning) {
 
                 record.read(audioBuffer, 0, bufferSize/2);
