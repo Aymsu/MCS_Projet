@@ -124,7 +124,6 @@ public class WaveformView extends SurfaceView {
             for (int x = 0; x < width; x++) {
                 int index = (int) ((x / width) * buffer.length);
                 short sample = buffer[index];
-
                 float y = (sample / MAX_AMPLITUDE_TO_DRAW) * centerY + centerY;
 
 

@@ -110,7 +110,8 @@ public class RecoVocale extends Activity {
                 updateDecibelLevel();
 
             }
-            Log.i(Constante.TAG, "Releasing Audio");
+
+
             record.stop();
             record.release();
             record = null;
