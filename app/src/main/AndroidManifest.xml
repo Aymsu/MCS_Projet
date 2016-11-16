@@ -21,6 +21,11 @@
         </activity>
         <activity android:name=".Aide" />
         <activity android:name=".RecoVocale"></activity>
+        <activity
+            android:name=".CircularRevealActivity"
+            android:theme="@style/Theme.Transparent"
+            android:launchMode="singleTask"
+            android:label="@string/title_activity_circular_reveal" />
     </application>
 
 </manifest>
