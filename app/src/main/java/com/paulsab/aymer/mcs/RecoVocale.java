@@ -76,9 +76,9 @@ public class RecoVocale extends Activity {
                 else if (event.getAction() == MotionEvent.ACTION_UP){
                     samplingThread.finish();                    talkButton.setText("Released");
                     // mediaRecorderToWav.stopRecording();
-                    //MediaPlayer mp = MediaPlayer.create(getBaseContext(),
-                      //      R.raw.bastion_sound);
-                    //mp.start();
+                    MediaPlayer mp = MediaPlayer.create(getBaseContext(),
+                            R.raw.bastion_sound);
+                    mp.start();
                 }
                 return false;
             }
