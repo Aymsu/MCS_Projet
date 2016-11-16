@@ -77,7 +77,7 @@ public class RecoVocale extends Activity {
                     samplingThread.finish();                    talkButton.setText("Released");
                     // mediaRecorderToWav.stopRecording();
                     MediaPlayer mp = MediaPlayer.create(getBaseContext(),
-                            R.raw.bastionsound);
+                            R.raw.bastion_sound);
                     mp.start();
                 }
                 return false;
