@@ -20,6 +20,8 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        System.out.println("Je hais git");
+
         wv = (WebView)findViewById(R.id.gifWebView);
         //wv.loadDataWithBaseURL("file:///android_asset/html/gif.html", null, "text/html", "UTF-8", null);
         wv.loadUrl("file:///android_asset/html/gif.html");
