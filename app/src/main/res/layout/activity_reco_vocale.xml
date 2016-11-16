@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_reco_vocale"
     android:layout_width="match_parent"
@@ -20,4 +21,18 @@
         android:layout_centerHorizontal="true"
         android:elevation="0dp"
         android:ellipsize="start" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:backgroundTint="@color/Blue"
+        app:fabSize="normal"
+        app:srcCompat="@android:drawable/ic_btn_speak_now"
+        android:layout_marginBottom="49dp"
+        android:id="@+id/floatingActionButton"
+        android:layout_above="@+id/talkButton"
+        android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>

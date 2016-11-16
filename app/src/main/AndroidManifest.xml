@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.paulsab.aymer.mcs">
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -20,7 +20,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".Aide" />
-        <activity android:name=".RecoVocale"></activity>
+        <activity android:name=".RecoVocale" />
+        <activity
+            android:name=".CircularRevealActivity"
+            android:theme="@style/Theme.Transparent"
+            android:launchMode="singleTask"
+            android:label="@string/title_activity_circular_reveal" />
     </application>
 
 </manifest>
