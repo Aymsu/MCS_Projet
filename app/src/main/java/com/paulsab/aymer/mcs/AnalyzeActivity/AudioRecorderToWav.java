@@ -2,13 +2,9 @@ package com.paulsab.aymer.mcs.AnalyzeActivity;
 
 import android.media.AudioFormat;
 import android.os.Environment;
-import android.util.Log;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -45,22 +41,6 @@ public class AudioRecorderToWav
         }
         wav.createNewFile();
         fileAudioInput = new FileOutputStream(wav);
-    }
-
-    private short[] byteToShort (byte[] buff ) {
-        short[] arrayShort = new short[buff.length/2];
-        ByteBuffer.wrap(buff).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(arrayShort);
-        return arrayShort;
-    }
-
-    public byte[] shortToByte( short[] data) {
-        byte[] arrayBytes = new byte[data.length*2];
-        int cptBytes = 0;
-        for ( int i = 0 ; i < data.length ; i++) {
-            arrayBytes[i*2] = (byte) (data[i] & 0x00FF);
-            arrayBytes[(i*2)+1] = (byte) (data[i] >> 8);
-        }
-        return arrayBytes;
     }
 
     public void write ( byte[] arrayByte , int read ) {
@@ -113,7 +93,7 @@ public class AudioRecorderToWav
             }
         }
     }
-    private void writeWavHeader(short channels, int sampleRate, short bitDepth) throws IOException {
+    public void writeWavHeader(short channels, int sampleRate, short bitDepth) throws IOException {
         // Convert the multi-byte integers to raw bytes in little endian format as required by the spec
         byte[] littleBytes = ByteBuffer
                 .allocate(14)
