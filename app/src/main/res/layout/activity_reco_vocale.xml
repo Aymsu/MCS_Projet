@@ -11,6 +11,18 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.paulsab.aymer.mcs.RecoVocale">
 
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="376dp"
+        android:id="@+id/intro"
+        android:layout_marginTop="11dp"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:layout_centerHorizontal="false"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="false" />
+
     <com.paulsab.aymer.mcs.WaveformView
         android:id="@+id/chart"
         android:layout_height="376dp"

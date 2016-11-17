@@ -5,9 +5,8 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -15,26 +14,14 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-
 
 import com.paulsab.aymer.mcs.AnalyzeActivity.AudioRecorderToWav;
 import com.paulsab.aymer.mcs.AnalyzeActivity.Constante;
-
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.net.URL;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class RecoVocale extends Activity {
 
@@ -44,10 +31,10 @@ public class RecoVocale extends Activity {
     }
 
     private Looper samplingThread;
-    private MediaRecorderToWav mediaRecorderToWav;
     private int bufferSize;
     private short[] audioBuffer;
     private WaveformView mWaveformView;
+    private TextView intro;
 
 
     @Override
@@ -55,15 +42,15 @@ public class RecoVocale extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reco_vocale);
 
+        intro = (TextView) findViewById(R.id.intro);
+
+        intro.setText("Maintenez le bouton appuyé pour lancer l'enregistrement, " +
+                "relachez une fois fini");
+
         FloatingActionButton micButton = (FloatingActionButton) findViewById(R.id.microButton);
 
-
-        mediaRecorderToWav = new MediaRecorderToWav();
-
         mWaveformView = (WaveformView) findViewById(R.id.chart);
-
-
-
+        mWaveformView.setVisibility(View.INVISIBLE);
 
         // Demander à l'utilisateur d'utiliser le microphone
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -84,7 +71,7 @@ public class RecoVocale extends Activity {
             public boolean onTouch(View v, MotionEvent event) {
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
+                    mWaveformView.setVisibility(View.VISIBLE);
                     samplingThread = new Looper();
                     samplingThread.start();
                 }
@@ -102,6 +89,7 @@ public class RecoVocale extends Activity {
                             mp.start();
                         }
                     });
+                   // mWaveformView.setVisibility(View.INVISIBLE);
                 }
                 return false;
             }
@@ -124,9 +112,9 @@ public class RecoVocale extends Activity {
 
             try {
             record = new AudioRecord(MediaRecorder.AudioSource.MIC, Constante.SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+                    Constante.RECORDER_CHANNELS,Constante.RECORDER_AUDIO_ENCODING, bufferSize);
             audioRecord = new AudioRecorderToWav("test.wav");
-            audioRecord.writeWavHeader2(AudioFormat.CHANNEL_IN_MONO,Constante.SAMPLE_RATE,AudioFormat.ENCODING_PCM_16BIT);
+            audioRecord.writeWavHeader2(Constante.RECORDER_CHANNELS,Constante.SAMPLE_RATE,Constante.RECORDER_AUDIO_ENCODING);
 
             byte[] buffer = new byte[bufferSize];
 
@@ -136,15 +124,9 @@ public class RecoVocale extends Activity {
                 return;
             }
             record.startRecording();
-            //audioRecord = new AudioRecorderToWav("toto.wav");
-
 
             while(isRunning) {
-                //TODO: Enregistrer chaque audioBuffer dans un tableau pour creer
-                //TODO: le fichier à la fin de la boucle
                 read  = record.read(buffer,0, bufferSize);
-
-                //Log.i(Constante.TAG,"data = "+read);
 
                 audioRecord.write(buffer,read);
 
