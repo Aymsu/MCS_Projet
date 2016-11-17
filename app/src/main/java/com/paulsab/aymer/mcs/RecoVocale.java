@@ -95,9 +95,16 @@ public class RecoVocale extends Activity {
                     // mediaRecorderToWav.stopRecording();
 
                     MediaPlayer mp = MediaPlayer.create(getBaseContext(),
-                            R.raw.bastion_sound);
+                            R.raw.loading_cube);
 
                     mp.start();
+                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            mp = MediaPlayer.create(getBaseContext(),R.raw.cube_loaded);
+                            mp.start();
+                        }
+                    });
                 }
                 return false;
             }

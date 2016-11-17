@@ -103,7 +103,7 @@ public class WaveformView extends SurfaceView {
     private void drawWaveform(Canvas canvas) {
         // Clear the screen each time because SurfaceView won't do this for us.
         canvas.drawColor(Color.DKGRAY);
-
+        //canvas.drawColor(Color.parseColor("#4D91E2"));
         float width = getWidth();
         float height = getHeight();
         float centerY = height / 2;
@@ -114,8 +114,8 @@ public class WaveformView extends SurfaceView {
         int brightness = colorDelta;
 
         for (short[] buffer : mAudioData) {
-            mPaint.setColor(Color.argb(brightness, 128, 255, 192));
-
+            //mPaint.setColor(Color.argb(brightness, 128, 255, 192));
+            mPaint.setColor(Color.parseColor("#4D91E2"));
             float lastX = -1;
             float lastY = -1;
 
