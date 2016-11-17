@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Mcs</string>
+    <string name="title_activity_circular_reveal">CircularRevealActivity</string>
 </resources>
