@@ -50,4 +50,17 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mpMario.pause();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mpMario.start();
+    }
+
+
 }
