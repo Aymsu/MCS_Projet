@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
@@ -17,7 +18,22 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import com.paulsab.aymer.mcs.AnalyzeActivity.AudioRecorderToWav;
 import com.paulsab.aymer.mcs.AnalyzeActivity.Constante;
+
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RecoVocale extends Activity {
 
@@ -32,6 +48,7 @@ public class RecoVocale extends Activity {
     private short[] audioBuffer;
     private WaveformView mWaveformView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,9 +59,7 @@ public class RecoVocale extends Activity {
 
         mWaveformView = (WaveformView) findViewById(R.id.chart);
 
-        bufferSize = AudioRecord.getMinBufferSize(Constante.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT);
-        audioBuffer = new short[bufferSize / 2];
+
 
 
         // Demander à l'utilisateur d'utiliser le microphone
@@ -74,10 +89,14 @@ public class RecoVocale extends Activity {
                     samplingThread.start();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP){
-                    samplingThread.finish();                    talkButton.setText("Released");
+                    samplingThread.finish();
+
+                    talkButton.setText("Released");
                     // mediaRecorderToWav.stopRecording();
+
                     MediaPlayer mp = MediaPlayer.create(getBaseContext(),
                             R.raw.bastionsound);
+
                     mp.start();
                 }
                 return false;
@@ -89,38 +108,74 @@ public class RecoVocale extends Activity {
     public class Looper extends Thread{
 
         AudioRecord record;
-        int minBytes;
-        long baseTimeMs;
         boolean isRunning = true;
-        boolean isPaused1 = false;
+        AudioRecorderToWav audioRecord;
 
 
         @Override
         public void run() {
 
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
+            bufferSize = AudioRecord.getMinBufferSize(Constante.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT);
+
+            try {
             record = new AudioRecord(MediaRecorder.AudioSource.MIC, Constante.SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+            audioRecord = new AudioRecorderToWav("test.wav");
+            audioRecord.writeWavHeader2(AudioFormat.CHANNEL_IN_MONO,Constante.SAMPLE_RATE,AudioFormat.ENCODING_PCM_16BIT);
+
+            byte[] buffer = new byte[bufferSize];
+
+            int read;
+            if (record.getState() != AudioRecord.STATE_INITIALIZED) {
+                Log.e(Constante.TAG, "Audio Record can't initialize!");
+                return;
+            }
             record.startRecording();
+            //audioRecord = new AudioRecorderToWav("toto.wav");
+
 
             while(isRunning) {
+                //TODO: Enregistrer chaque audioBuffer dans un tableau pour creer
+                //TODO: le fichier à la fin de la boucle
+                read  = record.read(buffer,0, bufferSize);
 
-                record.read(audioBuffer, 0, bufferSize/2);
+                //Log.i(Constante.TAG,"data = "+read);
+
+                audioRecord.write(buffer,read);
+
+                audioBuffer = byteToShort(buffer);
                 mWaveformView.updateAudioData(audioBuffer);
                 updateDecibelLevel();
-
             }
-
+            audioRecord.stop();
 
             record.stop();
             record.release();
             record = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                audioRecord.updateWavHeader();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private short[] byteToShort (byte[] buff ) {
+            short[] arrayShort = new short[buff.length/2];
+            ByteBuffer.wrap(buff).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(arrayShort);
+            return arrayShort;
         }
 
         public void finish() {
             isRunning = false;
             interrupt();
         }
+
+
 
         private void updateDecibelLevel() {
             // Compute the root-mean-squared of the sound buffer and then apply the formula for
@@ -138,14 +193,6 @@ public class RecoVocale extends Activity {
             final double db = 20 * Math.log10(rms);
         }
 
-        private void update(final double[] data) {
-            RecoVocale.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            });
-        }
     }
 
 

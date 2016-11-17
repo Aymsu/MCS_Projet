@@ -1,5 +1,6 @@
 package com.paulsab.aymer.mcs.AnalyzeActivity;
 
+import android.media.AudioFormat;
 import android.media.MediaRecorder;
 
 /**
@@ -8,11 +9,14 @@ import android.media.MediaRecorder;
 
 public class Constante {
     public static final String TAG = "audio";
-    public final static float MEAN_MAX = 16384f;   // Maximum signal value
-    public final static int AGC_OFF = MediaRecorder.AudioSource.VOICE_RECOGNITION;
-    public final static int FFT_BINS = 1024;
+
     public final static int SAMPLE_RATE = 44100;
-    public final static int UPDATE_MS = 150;
-    public final static int MAX_X = 20000;
-    public final static int MAX_Y = -90;
+
+    public static final int RECORDER_BPP = 16;
+    public static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
+    public static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+    public static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
+    public static final int RECORDER_SAMPLERATE = 44100;
+    public static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
+    public static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 }
