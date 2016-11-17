@@ -1,5 +1,6 @@
 package com.paulsab.aymer.mcs;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -14,6 +15,9 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.ViewTreeObserver;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.paulsab.aymer.mcs.AnalyzeActivity.AudioRecorderToWav;
@@ -35,6 +39,7 @@ public class RecoVocale extends Activity {
     private short[] audioBuffer;
     private WaveformView mWaveformView;
     private TextView intro;
+    private RelativeLayout circularLayout;
 
 
     @Override
@@ -46,6 +51,34 @@ public class RecoVocale extends Activity {
 
         intro.setText("Maintenez le bouton appuyé pour lancer l'enregistrement, " +
                 "relachez une fois fini");
+
+        circularLayout = (RelativeLayout) findViewById(R.id.activity_reco_vocale);
+
+        if(savedInstanceState == null)
+            circularLayout.setVisibility(View.INVISIBLE);
+
+
+        ViewTreeObserver viewTreeObserver = circularLayout.getViewTreeObserver();
+
+        if(viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    circularRevealActivity();
+                    circularLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.backButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartActivity.mpMario.start();
+                finish();
+                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+            }
+        });
 
         FloatingActionButton micButton = (FloatingActionButton) findViewById(R.id.microButton);
 
@@ -164,5 +197,21 @@ public class RecoVocale extends Activity {
 
     }
 
+    private void circularRevealActivity() {
 
+        int cx = circularLayout.getWidth() / 2;
+        int cy = circularLayout.getHeight() / 2;
+
+        float finalRadius = Math.max(circularLayout.getWidth(), circularLayout.getHeight());
+
+        // create the animator for this view (the start radius is zero)
+        Animator circularReveal = ViewAnimationUtils.createCircularReveal(circularLayout, cx, cy, 0, finalRadius);
+        circularReveal.setDuration(1000);
+
+        // make the view visible and start the animation
+        circularLayout.setVisibility(View.VISIBLE);
+        circularReveal.start();
     }
+
+
+}

@@ -17,7 +17,7 @@
         android:layout_height="376dp"
         android:id="@+id/intro"
         android:layout_marginTop="11dp"
-        android:textAlignment="center"
+        android:textAlignment="gravity"
         android:textSize="24sp"
         android:layout_centerHorizontal="false"
         android:layout_centerInParent="false"
@@ -44,6 +44,17 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="25dp"
         app:backgroundTint="@android:color/holo_purple" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:srcCompat="?attr/actionModeCloseDrawable"
+        android:id="@+id/backButton"
+        app:backgroundTint="@android:color/holo_green_dark"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
 
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.paulsab.aymer.mcs;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.webkit.WebView;
 public class StartActivity extends AppCompatActivity {
 
     WebView wv;
+    public static MediaPlayer mpMario;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -21,6 +23,10 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
 
         System.out.println("Je hais git");
+
+        mpMario = MediaPlayer.create(this, R.raw.mario);
+        mpMario.start();
+        mpMario.setLooping(true);
 
         wv = (WebView)findViewById(R.id.gifWebView);
         wv.loadUrl("file:///android_asset/html/gif.html");
@@ -39,13 +45,9 @@ public class StartActivity extends AppCompatActivity {
     public void goRecoVocale(View v){
 
         Intent i = new Intent(this, RecoVocale.class);
+        mpMario.pause();
         startActivity(i);
 
-    }
-
-    public void goTest( View v) {
-        Intent i = new Intent(this, CircularRevealActivity.class);
-        startActivity(i);
     }
 
 }
