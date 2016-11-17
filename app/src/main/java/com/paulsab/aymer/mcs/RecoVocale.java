@@ -6,6 +6,7 @@ import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
@@ -54,7 +55,9 @@ public class RecoVocale extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reco_vocale);
 
-        final Button talkButton = (Button) findViewById(R.id.talkButton);
+        FloatingActionButton micButton = (FloatingActionButton) findViewById(R.id.microButton);
+
+
         mediaRecorderToWav = new MediaRecorderToWav();
 
         mWaveformView = (WaveformView) findViewById(R.id.chart);
@@ -76,23 +79,17 @@ public class RecoVocale extends Activity {
             ActivityCompat.requestPermissions(this,rules,1);
         }
 
-        talkButton.setOnTouchListener(new View.OnTouchListener() {
+        micButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    Log.i("l","ALLLEZZZZZZZZZ");
-                    // mediaRecorderToWav.startRecording();
-                    talkButton.setText("pressssed");
                     samplingThread = new Looper();
                     samplingThread.start();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP){
                     samplingThread.finish();
-
-                    talkButton.setText("Released");
-                    // mediaRecorderToWav.stopRecording();
 
                     MediaPlayer mp = MediaPlayer.create(getBaseContext(),
                             R.raw.loading_cube);
@@ -153,7 +150,7 @@ public class RecoVocale extends Activity {
 
                 audioBuffer = byteToShort(buffer);
                 mWaveformView.updateAudioData(audioBuffer);
-                updateDecibelLevel();
+
             }
             audioRecord.stop();
 
@@ -182,23 +179,6 @@ public class RecoVocale extends Activity {
             interrupt();
         }
 
-
-
-        private void updateDecibelLevel() {
-            // Compute the root-mean-squared of the sound buffer and then apply the formula for
-            // computing the decibel level, 20 * log_10(rms). This is an uncalibrated calculation
-            // that assumes no noise in the samples; with 16-bit recording, it can range from
-            // -90 dB to 0 dB.
-            double sum = 0;
-
-            for (short rawSample : audioBuffer) {
-                double sample = rawSample / 32768.0;
-                sum += sample * sample;
-            }
-
-            double rms = Math.sqrt(sum / audioBuffer.length);
-            final double db = 20 * Math.log10(rms);
-        }
 
     }
 
