@@ -31,7 +31,7 @@ public class RecoVocale extends Activity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-//            System.loadLibrary("dtw-lib");
+            System.loadLibrary("dtw-lib");
     }
 
     private Looper samplingThread;
@@ -40,6 +40,8 @@ public class RecoVocale extends Activity {
     private WaveformView mWaveformView;
     private TextView intro;
     private RelativeLayout circularLayout;
+
+    public native String recoVocale(String filename);
 
 
     @Override
