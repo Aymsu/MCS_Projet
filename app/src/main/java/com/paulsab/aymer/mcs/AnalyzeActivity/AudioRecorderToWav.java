@@ -31,7 +31,10 @@ public class AudioRecorderToWav
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public String getFilenameOut() {
+        return filenameOut;
     }
 
     private void createTempFileName () throws IOException {

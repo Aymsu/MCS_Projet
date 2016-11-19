@@ -2,6 +2,8 @@ package com.paulsab.aymer.mcs;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
@@ -41,7 +43,7 @@ public class RecoVocale extends Activity {
     private TextView intro;
     private RelativeLayout circularLayout;
 
-    public native String recoVocale(String filename);
+    public native String recoVocale(String filename, AssetManager manager);
 
 
     @Override
@@ -55,6 +57,9 @@ public class RecoVocale extends Activity {
                 "relachez une fois fini");
 
         circularLayout = (RelativeLayout) findViewById(R.id.activity_reco_vocale);
+
+        /*AssetManager assetManager = getApplicationContext().getAssets();
+        intro.setText(recoVocale("file", assetManager));*/
 
         if(savedInstanceState == null)
             circularLayout.setVisibility(View.INVISIBLE);
@@ -170,6 +175,10 @@ public class RecoVocale extends Activity {
 
             }
             audioRecord.stop();
+
+            AssetManager assetManager = getApplicationContext().getAssets();
+                String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
+             Log.println(Log.INFO , Constante.TAG, ordre);
 
             record.stop();
             record.release();

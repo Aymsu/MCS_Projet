@@ -11,6 +11,11 @@
 #include <cstring>
 #include <vector>
 #include <limits>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+#include <android/log.h>
+
+#define APPNAME "MCS"
 
 #define nbMots 13
 #define nbLocuteurs 17
@@ -18,6 +23,7 @@
 std::string vocabulaire[] = {"arretetoi", "atterrissage", "avance", "decollage", "droite", "etatdurgence", "faisunflip", "gauche", "plusbas", "plushaut", "recule", "tournedroite", "tournegauche"};
 std::string locuteurs[] = {"M01", "M02","M03","M04", "M05","M06","M07","M08", "M09", "M10", "M11", "M12", "M13", "F02","F03","F04", "F05"};
 
+AAssetManager * manager;
 
 using namespace std;
 
@@ -25,13 +31,69 @@ using namespace std;
 char * fichier(std::string ordre, std::string locuteur){
     std::stringstream ss;
     ss << "corpus/dronevolant_nonbruite/" << locuteur << "_" << ordre << ".wav";
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%s", ss.str().c_str());
     //printf("%s\n", ss.str().c_str());
     return strdup(ss.str().c_str());
+}
+
+/**
+* Read a wave file.
+*
+* @param p_wav (OUT) pointer to a file descriptor
+* @param filename (IN) pointer to the name of the file
+* @param p_header (OUT) pointer to a wave header structure
+* @return none
+*/
+void wavReadFomAsset(AAsset **p_wav, char *filename, wavfile *p_header) {
+    //fopen_s(p_wav, filename, "rb"); //Windows version
+    *p_wav = AAssetManager_open(manager, filename, AASSET_MODE_UNKNOWN);
+    if (*p_wav == NULL) {
+        fprintf(stderr, "Can't open input file %s\n", filename);
+        exit(1);
+    }
+
+    // read header
+    if (AAsset_read(*p_wav, p_header, sizeof(wavfile)) < 1) {
+        fprintf(stderr, "Can't read input file header %s\n", filename);
+        exit(1);
+    }
+
+    // if wav file isn't the same endianness than the current environment
+    // we quit
+    if (is_big_endian()) {
+        if (memcmp((*p_header).id, "RIFX", 4) != 0) {
+            fprintf(stderr, "ERROR: %s is not a big endian wav file\n", filename);
+            exit(1);
+        }
+    }
+    else {
+        if (memcmp((*p_header).id, "RIFF", 4) != 0) {
+            fprintf(stderr, "ERROR: %s is not a little endian wav file\n", filename);
+            exit(1);
+        }
+    }
+
+    if (memcmp((*p_header).wavefmt, "WAVEfmt ", 8) != 0
+        || memcmp((*p_header).data, "data", 4) != 0
+            ) {
+        fprintf(stderr, "ERROR: Not wav format\n");
+        exit(1);
+    }
+    if ((*p_header).format != 16) {
+        fprintf(stderr, "\nERROR: not 16 bit wav format.");
+        exit(1);
+    }
+    if (memcmp((*p_header).data, "data", 4) != 0) {
+        fprintf(stderr, "ERROR: Prrroblem?\n");
+        exit(1);
+    }
 }
 
 void getMyMFCC(char * filename, float *** buffer, int * size){
     struct wavfile mywav;
     FILE * f;
+
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%s", filename);
 
     *buffer = new float*; 
 
@@ -39,28 +101,17 @@ void getMyMFCC(char * filename, float *** buffer, int * size){
 
     int16_t ** bufferSilence = new int16_t*;
     int newLength;
-
-	//printf("%d %s\n", mywav.bytes_in_data/sizeof(int16_t), filename);
-	//fseek(f, 0, SEEK_END);
-	//printf("%d \n", ftell(f));
-	
-    //printf("ICI\n");
     int16_t * wavbuffer;
 
     wavbuffer = new int16_t[mywav.bytes_in_data];
-    //int16_t * wavbuffer = (int16_t*)malloc(mywav.bytes_in_data);
-    //printf("LA\n");
     int16_t b;
     
-    //printf("%d\n", wavbuffer.size());
-    
     int i = 0;
-
 	while(fread(&b, sizeof(int16_t), 1, f) > 0){
-		//printf("%d %d\n", i, b);
 		wavbuffer[i++] = b;
-		//printf("%d %d\n", i, b);
 	}
+
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "size : %d ", mywav.bytes_in_data);
 
    //int n = fread(wavbuffer, sizeof(int16_t), mywav.bytes_in_data/sizeof(int16_t), f);
 
@@ -69,7 +120,39 @@ void getMyMFCC(char * filename, float *** buffer, int * size){
 
     //computeMFCC(*buffer, size, * bufferSilence, newLength, mywav.frequency, 512, 256, 13, 26);
     computeMFCC(*buffer, size, wavbuffer, mywav.bytes_in_data/sizeof(int16_t), mywav.frequency, 512, 256, 13, 26);
-    delete[] wavbuffer, f;
+    //delete[] wavbuffer, f;
+
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%d", *size);
+}
+
+void getMyMFCCFromAssets(char * filename, float *** buffer, int * size){
+    struct wavfile mywav;
+    AAsset * f;
+
+    *buffer = new float*;
+
+    wavReadFomAsset(&f, filename, &mywav);
+
+    //int16_t ** bufferSilence = new int16_t*;
+    //int newLength;
+    int16_t * wavbuffer;
+
+    wavbuffer = new int16_t[mywav.bytes_in_data];
+    int16_t b;
+
+    int i = 0;
+    while(AAsset_read(f, &b, sizeof(int16_t)) > 0){
+        wavbuffer[i++] = b;
+    }
+
+    //int n = fread(wavbuffer, sizeof(int16_t), mywav.bytes_in_data/sizeof(int16_t), f);
+
+    //removeSilence(wavbuffer, mywav.bytes_in_data/sizeof(int16_t), bufferSilence, &newLength, 10);
+    //delete(wavbuffer);
+
+    //computeMFCC(*buffer, size, * bufferSilence, newLength, mywav.frequency, 512, 256, 13, 26);
+    computeMFCC(*buffer, size, wavbuffer, mywav.bytes_in_data/sizeof(int16_t), mywav.frequency, 512, 256, 13, 26);
+    //delete[] wavbuffer, f;
 }
 
 int findWord(char * wavfile){
@@ -78,7 +161,7 @@ int findWord(char * wavfile){
     float ** buffWav;
     int sizeWav;
     getMyMFCC(wavfile, &buffWav, &sizeWav);
-    printf("Running ...\n");
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Running ...");
     for (int i = 0; i < nbLocuteurs; ++i)
     {
         float min = inf;
@@ -87,8 +170,9 @@ int findWord(char * wavfile){
         {
             float ** buffLoc;
             int sizeLoc;
-            getMyMFCC(fichier(vocabulaire[j], locuteurs[i]), &buffLoc, &sizeLoc);
+            getMyMFCCFromAssets(fichier(vocabulaire[j], locuteurs[i]), &buffLoc, &sizeLoc);
             float cout = dtw(sizeLoc, sizeWav, 13, *buffLoc, *buffWav);
+            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%f", cout);
             if(cout < min){
                 min = cout;
                 indiceMin = j;
@@ -106,38 +190,27 @@ int findWord(char * wavfile){
             max = MatriceConfusion[i];
             indiceMax = i;
         }
-        printf("%d\n", MatriceConfusion[i]);
+        //printf("%d\n", MatriceConfusion[i]);
     }
     return indiceMax;
 }
 
+extern "C"
 
 JNIEXPORT jstring JNICALL
-Java_com_paulsab_aymer_mcs_RecoVocale_recoVocale(JNIEnv *env, jobject instance, jstring filename_) {
+Java_com_paulsab_aymer_mcs_RecoVocale_recoVocale(JNIEnv *env, jobject instance,
+                                                 jstring filename_, jobject manager_) {
     const char *filename = env->GetStringUTFChars(filename_, 0);
-//int main(int argc, char const *argv[]){
+    manager = AAssetManager_fromJava(env, manager_);
+
     //std::string locuteur = "Aym";
-    //char * file = fichier(vocabulaire[4], locuteur);
+    //char * filename = fichier(vocabulaire[4], locuteur);
     //char * test = fichier(vocabulaire[0], "M01");
 
-    printf("Mot a reconnaitre : %s\n", vocabulaire[4].c_str());
+    //printf("Mot a reconnaitre : %s\n", vocabulaire[4].c_str());
 
     //TODO Adpater l'adresse du corpus
 
-    /*float ** buff1;
-    float ** buff2;
-    int size1;
-    int size2;
-
-    getMyMFCC(filename, &buff1, &size1);
-    printf("%d\n", size1);
-    getMyMFCC(test, &buff2, &size2);
-
-    float cout = dtw(size1, size2, 13, *buff1, *buff2);*/
-    //float cout = dtw(size2, size2, 13, *buff2, *buff2);
-
-//    std::stringstream ss;
-//    ss << cout;
     int indMot = findWord(strdup(filename));
     //printf("L'ordre reconnu est : %s\n", vocabulaire[indMot].c_str());
     //printf("cout : %f\n", cout);
