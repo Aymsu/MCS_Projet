@@ -14,11 +14,12 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include <android/log.h>
+#include <pthread.h>
 
 #define APPNAME "MCS"
 
 #define nbMots 13
-#define nbLocuteurs 17
+#define nbLocuteurs 8
 
 std::string vocabulaire[] = {"arretetoi", "atterrissage", "avance", "decollage", "droite", "etatdurgence", "faisunflip", "gauche", "plusbas", "plushaut", "recule", "tournedroite", "tournegauche"};
 std::string locuteurs[] = {"M01", "M02","M03","M04", "M05","M06","M07","M08", "M09", "M10", "M11", "M12", "M13", "F02","F03","F04", "F05"};
@@ -27,6 +28,15 @@ AAssetManager * manager;
 
 using namespace std;
 
+int best[nbLocuteurs];
+pthread_t threads[nbLocuteurs];
+
+struct parametres{
+    int indice;
+    std::string locuteur;
+    int size;
+    float * buffer;
+};
 
 char * fichier(std::string ordre, std::string locuteur){
     std::stringstream ss;
@@ -155,41 +165,60 @@ void getMyMFCCFromAssets(char * filename, float *** buffer, int * size){
     //delete[] wavbuffer, f;
 }
 
+void * findBest(void * params ){
+
+    struct parametres p = *((struct parametres*)params);
+
+    float inf = std::numeric_limits<float>::infinity();
+    float min = inf;
+    int indiceMin = 0;
+    for (int j = 0; j < nbMots; ++j)
+    {
+        float ** buffLoc;
+        int sizeLoc;
+        getMyMFCCFromAssets(fichier(vocabulaire[j], p.locuteur), &buffLoc, &sizeLoc);
+        float cout = dtw(sizeLoc, p.size, 13, *buffLoc, p.buffer);
+        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%f", cout);
+        if(cout < min){
+            min = cout;
+            indiceMin = j;
+        }
+        delete(*buffLoc);
+        delete(buffLoc);
+    }
+    best[p.indice] = indiceMin;
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%d", indiceMin);
+    return NULL;
+}
+
 int findWord(char * wavfile){
     int MatriceConfusion[nbMots] = {0};
-    float inf = std::numeric_limits<float>::infinity();
     float ** buffWav;
     int sizeWav;
     getMyMFCC(wavfile, &buffWav, &sizeWav);
     __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Running ...");
+    struct parametres p;
+    p.buffer = *buffWav;
+    p.size = sizeWav;
     for (int i = 0; i < nbLocuteurs; ++i)
     {
-        float min = inf;
-        int indiceMin = 0; 
-        for (int j = 0; j < nbMots; ++j)
-        {
-            float ** buffLoc;
-            int sizeLoc;
-            getMyMFCCFromAssets(fichier(vocabulaire[j], locuteurs[i]), &buffLoc, &sizeLoc);
-            float cout = dtw(sizeLoc, sizeWav, 13, *buffLoc, *buffWav);
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%f", cout);
-            if(cout < min){
-                min = cout;
-                indiceMin = j;
-            }
-            delete(*buffLoc);
-            delete(buffLoc);
-        }
-        MatriceConfusion[indiceMin] ++;
+        p.indice = i;
+        p.locuteur = locuteurs[i];
+        pthread_create(&threads[i], NULL, findBest, &p);
+    }
+    for (int i = 0; i < nbLocuteurs; ++i) {
+        pthread_join(threads[i], NULL);
+        MatriceConfusion[best[i]] ++;
     }
     int max = 0;
     int indiceMax = 0;
     for (int i = 0; i < nbMots; ++i)
     {
-        if(MatriceConfusion[i] > max){
+        if(MatriceConfusion[i] >= max){
             max = MatriceConfusion[i];
             indiceMax = i;
         }
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%d", MatriceConfusion[i]);
         //printf("%d\n", MatriceConfusion[i]);
     }
     return indiceMax;
