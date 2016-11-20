@@ -49,8 +49,7 @@ public class RecoVocale extends Activity {
 
         intro = (TextView) findViewById(R.id.intro);
 
-        intro.setText("Maintenez le bouton appuyé pour lancer l'enregistrement, " +
-                "relachez une fois fini");
+        intro.setText("Maintenez le bouton pour commencer l'enregistrement.");
 
         circularLayout = (RelativeLayout) findViewById(R.id.activity_reco_vocale);
 
@@ -146,7 +145,7 @@ public class RecoVocale extends Activity {
             try {
             record = new AudioRecord(MediaRecorder.AudioSource.MIC, Constante.SAMPLE_RATE,
                     Constante.RECORDER_CHANNELS,Constante.RECORDER_AUDIO_ENCODING, bufferSize);
-            audioRecord = new AudioRecorderToWav("test.wav");
+            audioRecord = new AudioRecorderToWav("testeu.wav");
             audioRecord.writeWavHeader2(Constante.RECORDER_CHANNELS,Constante.SAMPLE_RATE,Constante.RECORDER_AUDIO_ENCODING);
 
             byte[] buffer = new byte[bufferSize];
@@ -167,7 +166,12 @@ public class RecoVocale extends Activity {
                 mWaveformView.updateAudioData(audioBuffer);
 
             }
-            audioRecord.stop();
+            for ( int i = 1000 ; i > 0 ; i=i-20) {
+                for ( int j = 0 ; j < audioBuffer.length ; j++) {
+                    audioBuffer[j] = (short) i;
+                }
+                mWaveformView.updateAudioData(audioBuffer);
+            }
 
             record.stop();
             record.release();
@@ -177,7 +181,7 @@ public class RecoVocale extends Activity {
             }
             try {
                 audioRecord.updateWavHeader();
-
+                audioRecord.stop();
             } catch (IOException e) {
                 e.printStackTrace();
             }
