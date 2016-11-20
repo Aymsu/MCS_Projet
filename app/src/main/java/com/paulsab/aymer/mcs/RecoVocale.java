@@ -2,6 +2,8 @@ package com.paulsab.aymer.mcs;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
@@ -31,7 +33,7 @@ public class RecoVocale extends Activity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-//            System.loadLibrary("dtw-lib");
+            System.loadLibrary("dtw-lib");
     }
 
     private Looper samplingThread;
@@ -40,6 +42,8 @@ public class RecoVocale extends Activity {
     private WaveformView mWaveformView;
     private TextView intro;
     private RelativeLayout circularLayout;
+
+    public native String recoVocale(String filename, AssetManager manager);
 
 
     @Override
@@ -52,6 +56,9 @@ public class RecoVocale extends Activity {
         intro.setText("Maintenez le bouton pour commencer l'enregistrement.");
 
         circularLayout = (RelativeLayout) findViewById(R.id.activity_reco_vocale);
+
+        /*AssetManager assetManager = getApplicationContext().getAssets();
+        intro.setText(recoVocale("file", assetManager));*/
 
         if(savedInstanceState == null)
             circularLayout.setVisibility(View.INVISIBLE);
@@ -185,6 +192,11 @@ public class RecoVocale extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            AssetManager assetManager = getApplicationContext().getAssets();
+            String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
+            Log.println(Log.INFO , Constante.TAG, ordre);
+
         }
 
         private short[] byteToShort (byte[] buff ) {

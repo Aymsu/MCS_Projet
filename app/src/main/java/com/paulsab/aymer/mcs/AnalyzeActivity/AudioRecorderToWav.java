@@ -2,6 +2,7 @@ package com.paulsab.aymer.mcs.AnalyzeActivity;
 
 import android.media.AudioFormat;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 
@@ -31,7 +32,10 @@ public class AudioRecorderToWav
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public String getFilenameOut() {
+        return filenameOut;
     }
 
     private void createTempFileName () throws IOException {
@@ -59,6 +63,7 @@ public class AudioRecorderToWav
         }
     }
     public void updateWavHeader() throws IOException {
+        Log.println(Log.INFO, Constante.TAG, "taille : " + wav.length());
         byte[] sizes = ByteBuffer
                 .allocate(8)
                 .order(ByteOrder.LITTLE_ENDIAN)
