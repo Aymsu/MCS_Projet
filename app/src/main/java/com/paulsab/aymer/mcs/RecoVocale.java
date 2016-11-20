@@ -176,10 +176,6 @@ public class RecoVocale extends Activity {
             }
             audioRecord.stop();
 
-            AssetManager assetManager = getApplicationContext().getAssets();
-                String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
-             Log.println(Log.INFO , Constante.TAG, ordre);
-
             record.stop();
             record.release();
             record = null;
@@ -192,6 +188,11 @@ public class RecoVocale extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            AssetManager assetManager = getApplicationContext().getAssets();
+            String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
+            Log.println(Log.INFO , Constante.TAG, ordre);
+
         }
 
         private short[] byteToShort (byte[] buff ) {
