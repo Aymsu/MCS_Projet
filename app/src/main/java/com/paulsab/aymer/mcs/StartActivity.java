@@ -11,6 +11,7 @@ public class StartActivity extends AppCompatActivity {
 
     WebView wv;
     public static MediaPlayer mpMario;
+    public static boolean aideActif;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -23,6 +24,7 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
 
         System.out.println("Je hais git");
+        aideActif = false;
 
         mpMario = MediaPlayer.create(this, R.raw.mario);
         mpMario.start();
@@ -36,7 +38,7 @@ public class StartActivity extends AppCompatActivity {
 
     public void launchAide(View v){
 
-
+        aideActif = true;
         Intent i = new Intent(this, Aide.class);
         startActivity(i);
 
@@ -53,7 +55,8 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mpMario.pause();
+        if(!aideActif)
+            mpMario.pause();
     }
 
     @Override

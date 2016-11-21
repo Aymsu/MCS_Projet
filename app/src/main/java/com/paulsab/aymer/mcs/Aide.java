@@ -23,6 +23,8 @@ public class Aide extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aide);
 
+        StartActivity.mpMario.start();
+
         rootLayoutAide = (RelativeLayout) findViewById(R.id.activity_aide);
 
         ViewTreeObserver viewTreeObserver = rootLayoutAide.getViewTreeObserver();
@@ -46,6 +48,7 @@ public class Aide extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                StartActivity.aideActif = false;
                 finish();
                 overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
             }
