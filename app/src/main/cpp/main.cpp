@@ -18,10 +18,10 @@
 
 #define APPNAME "MCS"
 
-#define nbMots 13
+#define nbMots 9
 #define nbLocuteurs 8
 
-std::string vocabulaire[] = {"arretetoi", "atterrissage", "avance", "decollage", "droite", "etatdurgence", "faisunflip", "gauche", "plusbas", "plushaut", "recule", "tournedroite", "tournegauche"};
+std::string vocabulaire[] = {"arretetoi",  "avance", "droite", "etatdurgence", "faisunflip", "gauche", "recule", "tournedroite", "tournegauche"};
 std::string locuteurs[] = {"M01", "M02","M03","M04", "M05","M06","M07","M08", "M09", "M10", "M11", "M12", "M13", "F02","F03","F04", "F05"};
 
 AAssetManager * manager;
