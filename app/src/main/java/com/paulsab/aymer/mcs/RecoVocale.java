@@ -102,7 +102,8 @@ public class RecoVocale extends Activity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity.mpMario.start();
+                if(StartActivity.mute == 1)
+                    StartActivity.mpMario.start();
                 finish();
                 overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
             }
@@ -228,6 +229,7 @@ public class RecoVocale extends Activity {
             }
 
             AssetManager assetManager = getApplicationContext().getAssets();
+            System.out.println("toto= "+audioRecord.getFilenameOut());
             String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
             motReconnu = ordre;
 

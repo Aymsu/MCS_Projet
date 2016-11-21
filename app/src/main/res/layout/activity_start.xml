@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_start"
     android:layout_width="match_parent"
@@ -19,7 +20,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="14dp"
         android:id="@+id/buttonCommencer"
-        android:onClick="goRecoVocale" />
+        android:onClick="goRecoVocale"
+        android:backgroundTint="@color/colorPrimary" />
 
     <Button
         android:text="Aide"
@@ -30,7 +32,8 @@
         android:onClick="launchAide"
         android:layout_alignParentBottom="true"
         android:layout_alignEnd="@+id/buttonCommencer"
-        android:layout_alignStart="@+id/buttonCommencer" />
+        android:layout_alignStart="@+id/buttonCommencer"
+        android:backgroundTint="@color/colorPrimary" />
 
     <TextView
         android:text="Jumping Sumo 8"
@@ -51,5 +54,16 @@
         android:layout_above="@+id/buttonCommencer"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/titreView" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/rsz_sound"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/muteButton"
+        app:backgroundTint="@color/colorPrimary" />
 
 </RelativeLayout>

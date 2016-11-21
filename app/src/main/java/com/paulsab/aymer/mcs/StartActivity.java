@@ -2,6 +2,7 @@ package com.paulsab.aymer.mcs;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,8 @@ public class StartActivity extends AppCompatActivity {
     WebView wv;
     public static MediaPlayer mpMario;
     public static boolean aideActif;
+
+    public static int mute = 0;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -32,6 +35,22 @@ public class StartActivity extends AppCompatActivity {
 
         wv = (WebView)findViewById(R.id.gifWebView);
         wv.loadUrl("file:///android_asset/html/gif.html");
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.muteButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mute == 0){
+                    fab.setImageResource(R.drawable.rsz_mute);
+                    mute = 1;
+                    mpMario.pause();
+                }else{
+                    fab.setImageResource(R.drawable.rsz_sound);
+                    mpMario.start();
+                    mute = 0;
+                }
+            }
+        });
 
 
     }
