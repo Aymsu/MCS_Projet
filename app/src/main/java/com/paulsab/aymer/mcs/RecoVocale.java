@@ -2,6 +2,8 @@ package com.paulsab.aymer.mcs;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
@@ -31,7 +33,7 @@ public class RecoVocale extends Activity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-//            System.loadLibrary("dtw-lib");
+            System.loadLibrary("dtw-lib");
     }
 
     private Looper samplingThread;
@@ -41,6 +43,8 @@ public class RecoVocale extends Activity {
     private TextView intro;
     private RelativeLayout circularLayout;
 
+    public native String recoVocale(String filename, AssetManager manager);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +53,12 @@ public class RecoVocale extends Activity {
 
         intro = (TextView) findViewById(R.id.intro);
 
-        intro.setText("Maintenez le bouton appuyé pour lancer l'enregistrement, " +
-                "relachez une fois fini");
+        intro.setText("Maintenez le bouton pour commencer l'enregistrement.");
 
         circularLayout = (RelativeLayout) findViewById(R.id.activity_reco_vocale);
+
+        /*AssetManager assetManager = getApplicationContext().getAssets();
+        intro.setText(recoVocale("file", assetManager));*/
 
         if(savedInstanceState == null)
             circularLayout.setVisibility(View.INVISIBLE);
@@ -146,7 +152,7 @@ public class RecoVocale extends Activity {
             try {
             record = new AudioRecord(MediaRecorder.AudioSource.MIC, Constante.SAMPLE_RATE,
                     Constante.RECORDER_CHANNELS,Constante.RECORDER_AUDIO_ENCODING, bufferSize);
-            audioRecord = new AudioRecorderToWav("test.wav");
+            audioRecord = new AudioRecorderToWav("testeu.wav");
             audioRecord.writeWavHeader2(Constante.RECORDER_CHANNELS,Constante.SAMPLE_RATE,Constante.RECORDER_AUDIO_ENCODING);
 
             byte[] buffer = new byte[bufferSize];
@@ -167,7 +173,12 @@ public class RecoVocale extends Activity {
                 mWaveformView.updateAudioData(audioBuffer);
 
             }
-            audioRecord.stop();
+            for ( int i = 1000 ; i > 0 ; i=i-20) {
+                for ( int j = 0 ; j < audioBuffer.length ; j++) {
+                    audioBuffer[j] = (short) i;
+                }
+                mWaveformView.updateAudioData(audioBuffer);
+            }
 
             record.stop();
             record.release();
@@ -177,10 +188,15 @@ public class RecoVocale extends Activity {
             }
             try {
                 audioRecord.updateWavHeader();
-
+                audioRecord.stop();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            AssetManager assetManager = getApplicationContext().getAssets();
+            String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
+            Log.println(Log.INFO , Constante.TAG, ordre);
+
         }
 
         private short[] byteToShort (byte[] buff ) {

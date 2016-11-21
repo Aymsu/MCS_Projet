@@ -12,7 +12,6 @@
     tools:context="com.paulsab.aymer.mcs.RecoVocale">
 
     <TextView
-        android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="376dp"
         android:id="@+id/intro"
