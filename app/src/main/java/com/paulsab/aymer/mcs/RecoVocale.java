@@ -152,7 +152,7 @@ public class RecoVocale extends Activity {
             try {
             record = new AudioRecord(MediaRecorder.AudioSource.MIC, Constante.SAMPLE_RATE,
                     Constante.RECORDER_CHANNELS,Constante.RECORDER_AUDIO_ENCODING, bufferSize);
-            audioRecord = new AudioRecorderToWav("testeu.wav");
+            audioRecord = new AudioRecorderToWav("enreg.wav",getBaseContext());
             audioRecord.writeWavHeader2(Constante.RECORDER_CHANNELS,Constante.SAMPLE_RATE,Constante.RECORDER_AUDIO_ENCODING);
 
             byte[] buffer = new byte[bufferSize];

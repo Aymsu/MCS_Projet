@@ -1,5 +1,6 @@
 package com.paulsab.aymer.mcs.AnalyzeActivity;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.os.Environment;
 import android.util.Log;
@@ -22,11 +23,12 @@ public class AudioRecorderToWav
     private String filenameOut;
     private File wav;
     private FileOutputStream fileAudioInput;
+    private Context context;
 
-
-    public AudioRecorderToWav(String filenameOut) {
+    public AudioRecorderToWav(String filenameOut, Context context) {
         String directory = Environment.getExternalStorageDirectory().getAbsolutePath();
-        this.filenameOut = directory+ "/" +filenameOut;
+        this.filenameOut =  filenameOut;
+        this.context = context;
         try{
             createTempFileName();
         } catch (IOException e) {
@@ -35,16 +37,18 @@ public class AudioRecorderToWav
     }
 
     public String getFilenameOut() {
-        return filenameOut;
+        return wav.getAbsolutePath();
     }
 
+
     private void createTempFileName () throws IOException {
-        this.wav = new File(filenameOut);
-        if(wav.exists()){
-            wav.delete();
+        this.wav = new File(context.getFilesDir().getAbsolutePath().toString(), filenameOut);
+        try {
+            fileAudioInput = new FileOutputStream(wav);
+
+        } catch (Exception e) {
+            Log.i(Constante.TAG,"erreur "+e.getMessage());
         }
-        wav.createNewFile();
-        fileAudioInput = new FileOutputStream(wav);
     }
 
     public void write ( byte[] arrayByte , int read ) {
@@ -109,7 +113,9 @@ public class AudioRecorderToWav
                 .putShort((short) (channels * (bitDepth / 8)))
                 .putShort(bitDepth)
                 .array();
-
+        if ( !wav.canWrite()) {
+            Log.i(Constante.TAG,"erreur");
+        }
         // Not necessarily the best, but it's very easy to visualize this way
         fileAudioInput.write(new byte[]{
                 // RIFF header
