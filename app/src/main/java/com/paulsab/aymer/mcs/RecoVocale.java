@@ -19,11 +19,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.paulsab.aymer.mcs.AnalyzeActivity.AudioRecorderToWav;
 import com.paulsab.aymer.mcs.AnalyzeActivity.Constante;
+
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 
 import java.nio.ByteBuffer;
@@ -42,6 +47,12 @@ public class RecoVocale extends Activity {
     private WaveformView mWaveformView;
     private TextView intro;
     private RelativeLayout circularLayout;
+    private TextView mot;
+    private RelativeLayout motLayout;
+    private String motReconnu;
+
+    private ImageView etoile;
+    private ImageView etoile2;
 
     public native String recoVocale(String filename, AssetManager manager);
 
@@ -52,6 +63,17 @@ public class RecoVocale extends Activity {
         setContentView(R.layout.activity_reco_vocale);
 
         intro = (TextView) findViewById(R.id.intro);
+
+        etoile = (ImageView) findViewById(R.id.star1);
+        etoile.setImageResource(R.drawable.mariostar);
+
+        etoile2 = (ImageView) findViewById(R.id.star2);
+        etoile2.setImageResource(R.drawable.mariostar);
+
+
+        mot = (TextView) findViewById(R.id.motReconnu);
+        motLayout = (RelativeLayout) findViewById(R.id.frameMot);
+        motLayout.setVisibility(View.INVISIBLE);
 
         intro.setText("Maintenez le bouton pour commencer l'enregistrement.");
 
@@ -109,6 +131,8 @@ public class RecoVocale extends Activity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
+                motLayout.setVisibility(View.INVISIBLE);
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     mWaveformView.setVisibility(View.VISIBLE);
                     samplingThread = new Looper();
@@ -116,6 +140,16 @@ public class RecoVocale extends Activity {
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP){
                     samplingThread.finish();
+
+                    try {
+                        samplingThread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    mot.setText(motReconnu);
+                    motLayout.setVisibility(View.VISIBLE);
+
 
                     MediaPlayer mp = MediaPlayer.create(getBaseContext(),
                             R.raw.loading_cube);
@@ -195,6 +229,8 @@ public class RecoVocale extends Activity {
 
             AssetManager assetManager = getApplicationContext().getAssets();
             String ordre = recoVocale(audioRecord.getFilenameOut(), assetManager);
+            motReconnu = ordre;
+
             Log.println(Log.INFO , Constante.TAG, ordre);
 
         }
